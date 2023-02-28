@@ -1,22 +1,23 @@
 import "../scss/join.scss";
 import { Button, Form, Input, Layout } from "antd";
 import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Join() {
   const { Content } = Layout;
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const onFinish = (values) => {
     console.log("Success:", values);
+    navigate("/");
   };
 
-  const validatePassword = useCallback((value) => {
-    if (
-      form.getFieldValue("password") !== form.getFieldValue("passwordCheck")
-    ) {
-      return;
+  const validatePassword = useCallback((_, value) => {
+    if (!value || form.getFieldValue("password") === value) {
+      return Promise.resolve();
     }
-    return;
+    return Promise.reject("비밀번호가 일치하지 않습니다.");
   }, []);
 
   console.log(Promise);
@@ -33,6 +34,7 @@ export default function Join() {
           name="name"
           label="Name"
           rules={[{ required: true, message: "이름을 입력하세요" }]}
+          hasFeedback
         >
           <Input />
         </Form.Item>
@@ -40,6 +42,7 @@ export default function Join() {
           name="id"
           label="ID"
           rules={[{ required: true, message: "아이디를 입력하세요" }]}
+          hasFeedback
         >
           <Input />
         </Form.Item>
@@ -53,20 +56,22 @@ export default function Join() {
               message: "비밀번호는 8자리 이상입니다.",
             },
           ]}
+          hasFeedback
         >
           <Input.Password />
         </Form.Item>
         <Form.Item
           name="passwordCheck"
           label="PASSWORD 확인"
+          dependencies={["password"]}
           rules={[
             {
               required: true,
               min: 8,
-              message: "비밀번호는 8자리 이상입니다.",
               validator: validatePassword,
             },
           ]}
+          hasFeedback
         >
           <Input.Password />
         </Form.Item>
